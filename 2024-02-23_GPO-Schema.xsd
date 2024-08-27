@@ -1,0 +1,650 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+  targetNamespace="http://www.monasterium.net/NS/cei"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:cei="http://www.monasterium.net/NS/cei">
+  <xs:annotation>
+    <xs:documentation>Dieses Schema ist ein Derivat des von der Gallia Pontificia online (GPO,
+      https://qed.perspectivia.net/gallia-pontificia-online/) benutzten CEI-Schemas
+      (https://qed.perspectivia.net/data/2016-05-28_cei_monasterium.xsd) und wurde auf der Basis der
+      Papstregesten für die Reimser Erzbischöfe
+      (https://qed.perspectivia.net/data/2023-07-26_regesten_reims_1_gesamt.xml) erzeugt. Die Reimser
+      Regesten können auch mit dem vollständigen monasterium-Schema validiert werden; 
+      dieses Schema beinhaltet jedoch nur diejenigen Elemente, die in den Reimser
+      Regesten tatsächlich verwendet worden sind. Die Verwenung bestimmter Tags und Attribute ist
+      auf den Import in das Quellen- und Editionsportal von perspectiva.net
+      (https://qed.perspectivia.net) bzw. in die GPO hin ausgerichtet und gewährleistet die korrekte
+      Darstellung der Regesten auf dieser Plattform. Für den vollständigen Import werden außerdem
+      eine Bibliographie und ein Handschriftenverzeichnis im CSV-Format (vgl. die Dateien auf
+      https://qed.perspectivia.net/gallia-pontificia-online/regesten/reims1/datenexport) benötigt,
+      deren key-Werte den Attributen der jeweiligen XML-Elemente entsprechen. Bisher wurde das
+      Register beim Import aus den XML-Regesten erzeugt, zukünftig soll dies ebenfalls mittels einer
+      separaten CSV-Datei importiert werden. Version 1.0: Sebastian Gensicke,
+      2024-02-23.</xs:documentation>
+  </xs:annotation>
+  <xs:element name="cei">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:teiHeader"/>
+        <xs:element ref="cei:text"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="teiHeader">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:fileDesc"/>
+        <xs:element ref="cei:encodingDesc"/>
+        <xs:element ref="cei:projectDesc"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="fileDesc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:titleStmt"/>
+        <xs:element ref="cei:publicationStmt"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="titleStmt">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:title"/>
+        <xs:element ref="cei:author"/>
+        <xs:element maxOccurs="unbounded" ref="cei:p"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="title" type="xs:string"/>
+  <xs:element name="publicationStmt">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:availability"/>
+        <xs:element ref="cei:pubPlace"/>
+        <xs:element ref="cei:publisher"/>
+        <xs:element ref="cei:date"/>
+        <xs:element ref="cei:p"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="availability">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:anyURI">
+          <xs:attribute name="status" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pubPlace" type="xs:string"/>
+  <xs:element name="publisher" type="xs:string"/>
+  <xs:element name="date">
+    <xs:annotation>
+      <xs:documentation>Findet ausschließlich im cei:teiHeader Verwendung.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="value" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="encodingDesc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:idno"/>
+        <xs:element ref="cei:issuer"/>
+        <xs:element ref="cei:recipient"/>
+        <xs:element maxOccurs="unbounded" ref="cei:note"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="projectDesc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:p"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="text">
+    <xs:annotation>
+      <xs:documentation>Eine Sammlung mehrerer Regesten erfordert zunächst einen cei:group-tag als
+        Childelement. Als einzelnes Regest innerhalb einer cei:group benöttigt cei:text das Attribut
+        type="charter" und das Childelement cei:body.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="cei:group"/>
+        <xs:element minOccurs="0" ref="cei:body"/>
+      </xs:sequence>
+      <xs:attribute name="type" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>type="charter" für einzelne Regesten innerhalb einer
+            cei:group.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="group">
+    <xs:annotation>
+      <xs:documentation>Gruppiert mehrere einzelne Regesten (cei:text[@type="charter"]).</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="cei:text"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="body">
+    <xs:annotation>
+      <xs:documentation>Ein Regest, body von cei:text[@type="charter"]. Enthält die Regestennummer
+        und das Regest. </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:idno"> </xs:element>
+        <xs:element ref="cei:chDesc"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="idno">
+    <xs:annotation>
+      <xs:documentation>Nummer des Regests, ggf. zusammengesetzt aus Echtheitskriterium und Nummer:
+        "†12"</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="id" use="required">
+        <xs:annotation>
+          <xs:documentation>Regestennummer (ohne Echtheitskriterium)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="n" use="required">
+        <xs:annotation>
+          <xs:documentation>Echtheitskriterium: †, *, †?, *†?, ...</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="chDesc">
+    <xs:annotation>
+      <xs:documentation>Inhalt des Regests, aufgeteilt in Ausstellungsort und -Datum, den
+        eigentlichen Regestentext, ggf. Angaben zur originalen und kopialen Überlieferung sowie die
+        in cei:diplomaticAnalysis gebündelten Abschnitte. </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:issued"> </xs:element>
+        <xs:element ref="cei:abstract"> </xs:element>
+        <xs:element minOccurs="0" ref="cei:witnessOrig"> </xs:element>
+        <xs:element minOccurs="0" ref="cei:witListPar"> </xs:element>
+        <xs:element ref="cei:diplomaticAnalysis"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="issued">
+    <xs:annotation>
+      <xs:documentation>Enthält Ausstellungsort (cei:placeName[@type="Ausstellungsort"]) und
+        Ausstellungsdatum.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:placeName"/>
+        <xs:element ref="cei:dateRange"> </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dateRange">
+    <xs:annotation>
+      <xs:documentation>Das Ausstellungsdatum. Die nummerische Datierung erwartet zwei Daten nach
+        dem Schema JJJMMDD oder JJJJMMDD in den Attributen "from" und "to"</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="cei:foreign"/>
+      </xs:sequence>
+      <xs:attribute name="from" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>Datum: JJJMMDD oder JJJJMMDD</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="to" use="required" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>Datum: JJJMMDD oder JJJJMMDD</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="abstract">
+    <xs:annotation>
+      <xs:documentation>Der Regestentext. Aussteller und Empfänger werden besonders ausgezeichnet
+        (es sind jeweils auch mehrere möglich), daneben ist die Erstnennung jeder Person,
+        Institution und jeden Ortes auszuzeichnen. Literaturangaben und Querverweise innerhalb des
+        Regestentextes müssen innerhalb eines cei:note-tags stehen. Quellenzitate (cei:foreign)
+        werden kursiv gesetzt.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:issuer"> </xs:element>
+        <xs:element ref="cei:recipient"> </xs:element>
+        <xs:element ref="cei:persName"> </xs:element>
+        <xs:element ref="cei:orgName"> </xs:element>
+        <xs:element ref="cei:placeName"> </xs:element>
+        <xs:element ref="cei:note"> </xs:element>
+        <xs:element ref="cei:foreign"> </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="witnessOrig">
+    <xs:annotation>
+      <xs:documentation>Besonders bei Urkunden: Angabe des Originals. Das CEI-Schema erlaubt hier
+        neben cei:msIdentifier viele Inhalte nur innerhalb von cei:hi. An dieser Stelle wird es vor
+        allem genutzt, um mittels cei:ref Digitalisate verlinken zu können.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:hi"> </xs:element>
+        <xs:element ref="cei:msIdentifier"> </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="witListPar">
+    <xs:annotation>
+      <xs:documentation>Liste der handschriftlichen Überlieferungsträger. Mittels
+        Zwischenüberschriften (cei:head) werden diese nach Datierungen gruppiert, z.B.: "Kopien
+        (11.Jh.):"; "Fragmentarische Kopie (1. Viertel 12. Jh.):"; "Verlorene Kopie (Ende 12./Anfang
+        13. Jh.):"</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:head"/>
+        <xs:element ref="cei:witness"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="diplomaticAnalysis">
+    <xs:annotation>
+      <xs:documentation>Diplomatische Analyse. Enthält Incipit (cei:incipit), Editionen
+        (cei:listBiblEdition) und Regestenwerke (cei:listBiblRegest) sowie insbesondere bei mehreren
+        Überlieferungssträngen und -Formen ggf. weitere Angaben zur historiographischen
+        Überlieferung (cei:p[@type="Überlieferung"]), anderweitigen Erwähnungen in der
+        Überlieferung, die unter einer entsprechenden Überschrift erscheinen sollen
+        (cei:p[@type="Erwähnungen"]), Dekretalen (cei:p[@type="Dekretale"]) sowie einen oder mehrere
+        Sachkommentare (cei:p[@type="Sachkommentar"]). Daneben muss eine Überlieferungsform
+        (cei:p[@type="Überlieferungsform"]) als Filterkriterium hinterlegt werden. Verwendung finden
+        "Kopie", "Insert", "Briefsammlung", "Dekretale", "Original". Ein leeres Tag (&lt;cei:p
+        type="Überlieferungsform"/>) erhält als Filterkriterium "Keine Angabe". Außerdem wird jedes
+        Regest mittels cei:p[@type="PontifikatPP"] und cei:p[@type="PontifikatAEP"] einem
+        päpstlichen und einem erzbischöflichen Pontifikat zugeordnet. Bei Unsicherheiten und
+        Schismen ist die Nennung mehrer Personen möglich, bei Sedisvakanzen wird "Sedisvakanz des
+        erzbischöflichen Stuhls" oder "Sedisvakanz des päpstlichen Stuhls" gesetzt. Personen sind
+        mittels "cei:persName", Institutionen mittels "cei:orgName" auszuzeichnen und zu
+        identifizieren.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:incipit"> </xs:element>
+        <xs:element ref="cei:listBiblEdition"/>
+        <xs:element ref="cei:listBiblRegest"/>
+        <xs:element ref="cei:p"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="issuer">
+    <xs:annotation>
+      <xs:documentation>Einer oder mehrere Aussteller sind möglich: Personen (cei:persName) und
+        Institutionen (cei:orgName)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:orgName"/>
+        <xs:element ref="cei:persName"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="recipient">
+    <xs:annotation>
+      <xs:documentation>Einer oder mehrere Empfänger sind möglich: Personen (cei:persName) und Institutionen (cei:orgName)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:orgName"/>
+        <xs:element ref="cei:persName"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="persName">
+    <xs:annotation>
+      <xs:documentation>Eine Person</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="cei:foreign"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:anyURI">
+        <xs:annotation>
+          <xs:documentation>Normdaten:
+            id="VIAF:2318150647102510860009|GND:100940706|IDREF:234900733". Mehrer Angaben durch "|"
+            trennen. Derzeit verwendet sind VIAF, GND u. IDREF.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="key" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>Identifier der Person (Personenregister):
+            key="p02230"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="n">
+        <xs:annotation>
+          <xs:documentation>In wenigen Sonderfällen enthalten nicht nöher identifizierte Personen(gruppen) derzeit als einziges Attribut n="". Dies ist eine Übergangslösung, die erlaubt, das Markup zu behalten, ohne dass die "leeren" Einträge die Darstellung der Regesten und Register stören.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="reg">
+        <xs:annotation>
+          <xs:documentation>Ggf. normalisierte Form: reg="Eugen II., Papst"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="orgName">
+    <xs:annotation>
+      <xs:documentation>Eine Institution</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="cei:foreign"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:anyURI">
+        <xs:annotation>
+          <xs:documentation>Normdaten: id="VIAF:141528903|GND:4450340-4". Mehrer Angaben durch "|"
+            trennen. Derzeit verwendet sind VIAF, GND u. IDREF. Verweise auf CartulR (z.B.
+            id="CartulR:1499") werden online bisher nicht dargestellt.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="key" use="required" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>Identifier der Institution (Ortsregister):
+            key="i00248"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="reg">
+        <xs:annotation>
+          <xs:documentation>Ggf. normalisierter Name: reg="Reims, Abtei
+            Saint-Remi"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="placeName">
+    <xs:annotation>
+      <xs:documentation>Ein Ortsname</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="cei:foreign"/>
+      </xs:sequence>
+      <xs:attribute name="id">
+        <xs:annotation>
+          <xs:documentation>Normdaten: id="VIAF:134817535|GEONAMES:3182179" Mehrer Angaben durch "|"
+            trennen. Derzeit verwendet sind VIAF, GND u. GEONAMES.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="key" use="required" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>Identifier des Ortes (Ortsregister): key="o01482"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="reg">
+        <xs:annotation>
+          <xs:documentation>Ggf. normalisierter Name: reg="Benevent"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="type" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>Ausstellungsorte sind durch type="Ausstellungsort" zusätzlich gekennzeichnet.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="note">
+    <xs:annotation>
+      <xs:documentation>Literaturangaben oder Links müssen an manchen Stellen, z.B. innerhalb des
+        Regestentextes (cei:abstract) oder dort, wo zusätzlich cei:hi erforderlich ist, innerhalb
+        eines cei:note-Tags stehen. cei:note darf noch mehr Elemente enthalten, vgl. das komplette
+        CEI-Schema. Außerdem steht cei:note im cei:teiHeader, was für die GPO bisher der einzige Ort
+        ist, an dem cei:date verwendet werden darf.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:bibl"> </xs:element>
+        <xs:element ref="cei:ref"/>
+        <xs:element ref="cei:persName"/>
+        <xs:element ref="cei:date"/>
+      </xs:choice>
+      <xs:attribute name="n">
+        <xs:annotation>
+          <xs:documentation>Wird ausschließlich im cei:teiHeader verwendet.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="type" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>Wird ausschließlich im cei:teiHeader verwendet, um bestimmte Elemente zu
+            erklären.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="witness">
+    <xs:annotation>
+      <xs:documentation>Ein Textzeuge (Handschrift/Archivalie), bestehend aus einer Signatur
+        (cei:msIdentifier). Zusätzliche Angaben, z.B. ggf. Literatur und insbesondere Verlinkungen
+        (cei:ref), müssen innerhalb von cei:hi (und bei Literatur auch cei:note) stehen. cei:rubrum
+        erlaubt die Angabe eines Rubrums.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:msIdentifier"/>
+        <xs:element ref="cei:foreign"/>
+        <xs:element ref="cei:hi"/>
+        <xs:element ref="cei:rubrum"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="msIdentifier">
+    <xs:annotation>
+      <xs:documentation>Eine Handschriften-/Archivsignatur</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="n" use="required">
+        <xs:annotation>
+          <xs:documentation>Identifier der Handschrift (Handschriftenverzeichnis): n="Metz,_BM,_Ms._826"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="rubrum">
+    <xs:annotation>
+      <xs:documentation>Erlaubt die Angabe eines Rubrums aus der Handschrift.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:foreign"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="head" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Erlaubt Zwischenüberschriften innerhalb der Liste handschriftlicher
+        Überlieferungsträger (cei:witListPar). Hier werden vor allem Datierungen angegeben, um die
+        einzelnen Handschriften zu gruppieren, z.B.: "Kopien (11.Jh.):"; "Fragmentarische Kopie (1.
+        Viertel 12. Jh.):"; "Verlorene Kopie (Ende 12./Anfang 13. Jh.):"</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="incipit">
+    <xs:annotation>
+      <xs:documentation>Das Incipit. Der einleitende Geviertstrich und der abschließende Punkt
+        werden automatisch hinzugefügt und dürfen daher nicht enthalten sein!. Es ist möglich,
+        mehrere Initien anzugeben. Die Incipits werden im Initienverzeichns
+        aufgeführt.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="cei:foreign"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="listBiblEdition">
+    <xs:annotation>
+      <xs:documentation>Angabe von Editionen. IdR. werden diese aufsteigend chronologisch sortiert,
+        am Schluss stehen Online-Datenbanken.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="cei:bibl"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="listBiblRegest">
+    <xs:annotation>
+      <xs:documentation>Angabe von Regestenwerken. Zu Beginn wird Jaffé (3. und 2. Auflage) zitiert,
+        dann andere Bände des Papsturkundenwerks und der Regesta Imperii, weitere Werke folgen
+        chronologisch aufsteigend sortiert. cei:ref als unmittelbares Childelement von
+        cei:listBblRegest geht auf Querverweise auf andere GPO-Regesten zurück; Verlinkungen auf
+        externe Ressourcen (ebenfalls cei:ref) stehen innerhalb von cei:bibl.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:bibl"/>
+        <xs:element ref="cei:ref"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="p">
+    <xs:annotation>
+      <xs:documentation>cei:p erfüllt unterschiedliche Zwecke, die mittels des type-Attributs
+        unterscheiden werden können. Insbesondere bei mehreren Überlieferungssträngen und -Formen
+        können bspw. weitere Angaben zur historiographischen Überlieferung
+        (cei:p[@type="Überlieferung"]) oder anderweitigen Erwähnungen in der Überlieferung
+        (cei:p[@type="Erwähnungen"]) aufgeführt und unter eigenen Überschriften angezeigt werden.
+        Darunter fällt auch die Angabe von Dekretalen (cei:p[@type="Dekretale"]). Daneben sind ein
+        oder mehrere Sachkommentare (cei:p[@type="Sachkommentar"]) möglich. In den Bereich der
+        Metadaten fällt die Angabe der Überlieferungsform (cei:p[@type="Überlieferungsform"]) als
+        Filterkriterium. Verwendung finden "Kopie", "Insert", "Briefsammlung", "Dekretale",
+        "Original". Ein leeres Tag (cei:p\) erhält als Filterkriterium "Keine Angabe". Außerdem wird
+        jedes Regest mittels cei:p[@type="PontifikatPP"] und cei:p[@type="PontifikatAEP"] einem
+        päpstlichen und einem erzbischöflichen Pontifikat zugeordnet. Bei Unsicherheiten und
+        Schismen ist die Nennung mehrer Personen möglich, bei Sedisvakanzen wird "Sedisvakanz des
+        erzbischöflichen Stuhls" oder "Sedisvakanz des päpstlichen Stuhls" gesetzt. Personen sind
+        mittels "cei:persName", Institutionen mittels "cei:orgName" auszuzeichnen und zu
+        identifizieren. Auch im cei:teiHeader kommt cei:p zum Einsatz.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:msIdentifier"/>
+        <xs:element ref="cei:bibl"/>
+        <xs:element ref="cei:ref"/>
+        <xs:element ref="cei:foreign"/>
+        <xs:element ref="cei:persName"/>
+        <xs:element ref="cei:orgName"/>
+        <xs:element ref="cei:note"/>
+      </xs:choice>
+      <xs:attribute name="type" use="required" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>"Überlieferung", "Erwähnungen", "Dekretale", "Sachkommentar",
+            "Überlieferungsform", "PontifikatPP", "PontifikatAEP" sowie verschiedene
+            cei:teiHeader-Inhalte.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="bibl">
+    <xs:annotation>
+      <xs:documentation>Eine Literaturangabe. Zitiert wird mit Kurztiteln und Siglen, Dekretalen
+        werden über das type-Attribut gesondert gekennzeichnet, damit sie im Dekretalenverzeichnis
+        aufgeführt werden. Enthält ggf. einen Autorennamen (cei:author). Mittels cei:ref, das die
+        Angaben zu Seiten und ggf. Nr. umschließen soll, sollen Digitalsiate seitengenau verlinkt
+        werden. cei:sup ermöglicht es, Buchstaben oder Zahlen hochzustellen, cei:foreign ermöglicht
+        die Kursivsatz.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:author"/>
+        <xs:element ref="cei:ref"/>
+        <xs:element ref="cei:sup"/>
+        <xs:element ref="cei:foreign"/>
+      </xs:choice>
+      <xs:attribute name="key">
+        <xs:annotation>
+          <xs:documentation>Identifier des Werks (Bibliographie): key="Migne,_PL"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="type" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>type="Sigle", type="Kurztitel" und type="Dekretale"</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="author">
+    <xs:annotation>
+      <xs:documentation>Der Autor einer Publikation, wird in Kapitälchen gesetzt. Mittelalterliche
+        Autoren sollen nicht in Kapitälchen gesetzt werden und benötigen daher das Attribut
+        rend="medieval".</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="rend" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>rend="medieval" für mittelalterliche Autoren.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="foreign">
+    <xs:annotation>
+      <xs:documentation>Ein Zitat aus der Quelle, wird Kursiv gesetzt.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="lang" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>"lat" für Latein</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ref">
+    <xs:annotation>
+      <xs:documentation>Ein Verweis. Für die Verlinkung von Seiten einer Literaturangabe oder Digitalisaten von Handschriften: type="external" target="http://...". Für einen Querverweis auf ein anderes Regest: type="internal" n="regesten" target="[Nr. ("@id") des Regests]".</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="n" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>n="regesten" bei Querverweisen</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="target">
+        <xs:annotation>
+          <xs:documentation>Hyperlink oder "@id" eines anderen Regests.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="type" type="xs:NCName">
+        <xs:annotation>
+          <xs:documentation>n="external": Hyperlinks auf externe Ressourcen. n="internal":
+            Verknüpfung zu einem anderen Regest.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="hi">
+    <xs:annotation>
+      <xs:documentation>Wird an mehreren Stellen benötigt, um die Verwendung von cei:note und cei:ref zu erlauben.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cei:note"/>
+        <xs:element ref="cei:ref"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sup" type="xs:NMTOKEN">
+    <xs:annotation>
+      <xs:documentation>Eine hochgestellte Zahl oder ein hochgestellter Buchstabe.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+</xs:schema>
